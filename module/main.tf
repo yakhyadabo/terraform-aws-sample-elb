@@ -56,6 +56,13 @@ resource "aws_elb" "service" {
     lb_protocol       = "TCP"
   }
 
+#  listener {
+#    instance_port     = 22
+#    instance_protocol = "TCP"
+#    lb_port           = 22
+#    lb_protocol       = "TCP"
+#  }
+
   tags = {
     Name               = "${var.service_name}-${var.environment}"
   }
@@ -77,7 +84,7 @@ resource "aws_autoscaling_group" "service" {
   name_prefix   = "${var.service_name}-${var.environment}-"
   launch_configuration      = aws_launch_configuration.service.name
   min_size                  = 1
-  max_size                  = 3
+  max_size                  = length(data.aws_subnets.service.ids)
   desired_capacity          = "2"
   health_check_type         = "ELB"
   load_balancers            = [aws_elb.service.id]
