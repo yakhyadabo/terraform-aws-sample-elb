@@ -42,7 +42,7 @@ data "aws_ami" "ubuntu" {
 
 resource "aws_elb" "service" {
   name_prefix   = "${var.service_name}-"
-  security_groups             = [aws_security_group.http.id]
+  security_groups             = [aws_security_group.http.id, aws_security_group.ssh.id]
   subnets                     = data.aws_subnets.service.ids
   cross_zone_load_balancing   = true
   internal                    = true
@@ -65,6 +65,7 @@ resource "aws_launch_configuration" "service" {
   name_prefix   = "${var.service_name}-${var.environment}-"
   image_id      = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
+  security_groups = [aws_security_group.http.id, aws_security_group.ssh.id]
   key_name = var.key_name
 
   lifecycle {
