@@ -43,7 +43,7 @@ data "aws_ami" "ubuntu" {
 resource "aws_elb" "service" {
   name_prefix   = "${var.service_name}-${var.environment}-"
   security_groups             = [aws_security_group.http.id]
-  # subnets                     = data.aws_subnet_ids.
+  subnets                     = data.aws_subnets.service.ids
   cross_zone_load_balancing   = true
   internal                    = true
   connection_draining         = true
@@ -66,6 +66,7 @@ resource "aws_launch_configuration" "service" {
   image_id      = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
   key_name = var.key_name
+
   lifecycle {
     create_before_destroy = true
   }
@@ -80,8 +81,7 @@ resource "aws_autoscaling_group" "service" {
   health_check_type         = "ELB"
   load_balancers            = [aws_elb.service.id]
   termination_policies      = ["OldestLaunchConfiguration"]
-  for_each      = toset(data.aws_subnets.service.ids)
-  vpc_zone_identifier       = each.value
+  vpc_zone_identifier       = data.aws_subnets.service.ids
   wait_for_capacity_timeout = "20m"
 
   lifecycle {
