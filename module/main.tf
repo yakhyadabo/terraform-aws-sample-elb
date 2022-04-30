@@ -56,6 +56,14 @@ resource "aws_elb" "service" {
     lb_protocol       = "TCP"
   }
 
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "HTTP:80/"
+    interval            = 30
+  }
+  
 #  listener {
 #    instance_port     = 22
 #    instance_protocol = "TCP"
