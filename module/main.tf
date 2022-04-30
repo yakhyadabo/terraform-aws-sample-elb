@@ -68,12 +68,18 @@ resource "aws_elb" "service" {
   }
 }
 
+data "template_file" "nginx" {
+  template = file("${path.module}/file/nginx.sh")
+}
+
 resource "aws_launch_configuration" "service" {
   name_prefix   = "${var.service_name}-${var.environment}-"
   image_id      = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
   security_groups = [aws_security_group.http.id, aws_security_group.ssh.id]
   key_name = var.key_name
+
+  user_data              = data.template_file.nginx.rendered
 
   lifecycle {
     create_before_destroy = true
@@ -85,7 +91,7 @@ resource "aws_autoscaling_group" "service" {
   launch_configuration      = aws_launch_configuration.service.name
   min_size                  = 1
   max_size                  = length(data.aws_subnets.service.ids)
-  desired_capacity          = "2"
+  desired_capacity          = "1"
   health_check_type         = "ELB"
   load_balancers            = [aws_elb.service.id]
   termination_policies      = ["OldestLaunchConfiguration"]
