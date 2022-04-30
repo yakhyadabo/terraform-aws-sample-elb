@@ -41,7 +41,7 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_elb" "service" {
-  name_prefix   = "${var.service_name}-${var.environment}-"
+  name_prefix   = "${var.service_name}-"
   security_groups             = [aws_security_group.http.id]
   subnets                     = data.aws_subnets.service.ids
   cross_zone_load_balancing   = true
@@ -75,7 +75,7 @@ resource "aws_launch_configuration" "service" {
 resource "aws_autoscaling_group" "service" {
   name_prefix   = "${var.service_name}-${var.environment}-"
   launch_configuration      = aws_launch_configuration.service.name
-  min_size                  = 2
+  min_size                  = 1
   max_size                  = 3
   desired_capacity          = "2"
   health_check_type         = "ELB"
