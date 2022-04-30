@@ -1,0 +1,10 @@
+*
+!.gitattibutes
+!.gitignore
+!.env
+!*.tf
+!*.tfvars
+!README.adoc
+!Makefile
+!Dockerfile
+!*/
