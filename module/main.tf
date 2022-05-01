@@ -51,9 +51,9 @@ resource "aws_elb" "service" {
 
   listener {
     instance_port     = 80
-    instance_protocol = "TCP"
+    instance_protocol = "http"
     lb_port           = 80
-    lb_protocol       = "TCP"
+    lb_protocol       = "http"
   }
 
   health_check {
@@ -63,7 +63,7 @@ resource "aws_elb" "service" {
     target              = "HTTP:80/"
     interval            = 30
   }
-  
+
 #  listener {
 #    instance_port     = 22
 #    instance_protocol = "TCP"
@@ -96,12 +96,11 @@ resource "aws_launch_configuration" "service" {
 
 resource "aws_autoscaling_group" "service" {
   name_prefix   = "${var.service_name}-${var.environment}-"
-  launch_configuration      = aws_launch_configuration.service.name
+  launch_configuration      = aws_launch_configuration.service.id
   min_size                  = 1
   max_size                  = length(data.aws_subnets.service.ids)
-  desired_capacity          = "1"
   health_check_type         = "ELB"
-  load_balancers            = [aws_elb.service.id]
+  load_balancers            = [aws_elb.service.name]
   termination_policies      = ["OldestLaunchConfiguration"]
   vpc_zone_identifier       = data.aws_subnets.service.ids
   wait_for_capacity_timeout = "20m"
