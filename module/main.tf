@@ -45,7 +45,6 @@ resource "aws_elb" "service" {
   security_groups             = [aws_security_group.http.id, aws_security_group.ssh.id]
   subnets                     = data.aws_subnets.service.ids
   cross_zone_load_balancing   = true
-  internal                    = true
   connection_draining         = true
   connection_draining_timeout = 300
 
